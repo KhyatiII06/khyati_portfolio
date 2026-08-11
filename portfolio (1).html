@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Khyati Singh — Full Stack & AI Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#0a0a0c;
+  --black-2:#111114;
+  --red:#ff3b30;
+  --red-deep:#8b0a14;
+  --white:#f5f0ec;
+  --grey:#8a8a90;
+  --glass:rgba(255,255,255,0.045);
+  --glass-border:rgba(255,255,255,0.09);
+  --font-display:'Space Grotesk',sans-serif;
+  --font-body:'Inter',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--black);
+  color:var(--white);
+  font-family:var(--font-body);
+  overflow-x:hidden;
+  cursor:default;
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important;}
+}
+::selection{background:var(--red);color:var(--black);}
+
+/* ---------- particle canvas ---------- */
+#particle-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+
+/* ---------- intro overlay ---------- */
+#intro{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100vh;
+    background:black;
+    z-index:99999;
+    overflow:hidden;
+    filter:blur(0px);
+    transform:scale(1);
+    transition:opacity .9s cubic-bezier(.4,0,.2,1),
+               visibility .9s cubic-bezier(.4,0,.2,1),
+               filter .9s cubic-bezier(.4,0,.2,1),
+               transform .9s cubic-bezier(.4,0,.2,1);
+}
+.hidden{
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    filter:blur(16px);
+    transform:scale(1.06);
+}
+#intro::before{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background:
+    radial-gradient(circle at center,
+    rgba(255,40,40,.18),
+    transparent 70%);
+
+    animation:pulseGlow 5s infinite;
+
+    z-index:2;
+
+    pointer-events:none;
+
+}
+#intro-video{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:center;
+    z-index:1;
+}
+#intro-text{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    z-index:5;
+    pointer-events:none;
+    perspective:1200px;
+}
+
+#intro-text h1,
+#intro-text h2,
+#intro-text h3{
+
+    margin:0;
+    opacity:0;
+
+    transform:
+        translateY(80px)
+        rotateX(-90deg)
+        scale(.8);
+
+    transition:
+        1.2s cubic-bezier(.16,1,.3,1);
+
+    text-align:center;
+}
+
+#line1,
+#line2,
+#line3,
+#line4
+#line5{
+   position:absolute;
+    opacity:0;
+
+    transform:
+        translateY(80px)
+        rotateX(-90deg)
+        scale(.8);
+
+    transition:1.2s cubic-bezier(.16,1,.3,1);
+
+    text-align:center;
+}
+#intro::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg, rgba(10,10,12,0.15) 0%, rgba(10,10,12,0.05) 55%, rgba(10,10,12,0.95) 100%);
+  pointer-events:none;
+}
+#intro-skip{
+  position:absolute;bottom:34px;right:34px;z-index:10;
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;
+  color:var(--grey);background:rgba(10,10,12,0.4);border:1px solid var(--glass-border);
+  padding:9px 16px;border-radius:100px;cursor:pointer;text-transform:uppercase;
+  transition:all .3s ease;backdrop-filter:blur(6px);
+}
+#intro-skip:hover{color:var(--white);border-color:var(--red);}
+
+/* ---------- nav ---------- */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:26px 5vw;
+  background:linear-gradient(to bottom, rgba(10,10,12,0.85), transparent);
+  transform:translateY(-120%);
+  transition:transform .9s cubic-bezier(.16,1,.3,1);
+}
+nav.show{transform:translateY(0);}
+.nav-logo{font-family:var(--font-display);font-weight:600;font-size:15px;letter-spacing:.02em;}
+.nav-logo span{color:var(--red);}
+.nav-links{display:flex;gap:40px;list-style:none;}
+.nav-links a{
+  color:var(--grey);text-decoration:none;font-size:12.5px;letter-spacing:.1em;
+  text-transform:uppercase;font-family:var(--font-mono);transition:color .3s ease;position:relative;
+}
+.nav-links a:hover{color:var(--white);}
+.nav-links a::after{
+  content:'';position:absolute;left:0;bottom:-6px;width:0;height:1px;background:var(--red);
+  transition:width .3s ease;
+}
+.nav-links a:hover::after{width:100%;}
+#nav-toggle{display:none;}
+
+/* ---------- hero ---------- */
+.hero{
+  position:relative;min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;z-index:2;padding:0 5vw;
+  perspective:1200px;
+}
+.hero-inner{transform-style:preserve-3d;transition:transform .15s ease-out;text-align:center;}
+.hero-eyebrow{
+  font-family:var(--font-mono);font-size:12px;letter-spacing:.3em;color:var(--red);
+  text-transform:uppercase;margin-bottom:22px;opacity:0;
+}
+.hero-eyebrow.reveal-hero{animation:fadeUp .9s cubic-bezier(.16,1,.3,1) forwards .1s;}
+.hero-name{
+  font-family:var(--font-display);font-weight:700;
+  font-size:clamp(3.2rem,11vw,9.5rem);line-height:.92;letter-spacing:-.02em;
+  opacity:0;
+}
+.hero-name.reveal-hero{animation:fadeUp 1s cubic-bezier(.16,1,.3,1) forwards .25s;}
+.hero-name .accent{color:var(--red);}
+.roles{
+  margin-top:28px;height:26px;overflow:hidden;position:relative;
+  opacity:0;
+}
+.roles.reveal-hero{animation:fadeUp .9s cubic-bezier(.16,1,.3,1) forwards .45s;}
+.roles ul{list-style:none;position:relative;animation:roleRotate 9s steps(1) infinite;}
+.roles li{
+  font-family:var(--font-mono);font-size:13px;letter-spacing:.2em;color:var(--grey);
+  text-transform:uppercase;height:26px;display:flex;align-items:center;justify-content:center;
+}
+@keyframes roleRotate{
+  0%,30%{transform:translateY(0);} 33%,63%{transform:translateY(-26px);}
+  66%,96%{transform:translateY(-52px);} 100%{transform:translateY(-78px);}
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px) scale(.97);filter:blur(6px);}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0);}}
+.scroll-cue{
+  position:absolute;bottom:42px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  opacity:0;
+}
+.scroll-cue.reveal-hero{animation:fadeUp .9s cubic-bezier(.16,1,.3,1) forwards .65s;}
+.scroll-cue span{font-family:var(--font-mono);font-size:10px;letter-spacing:.25em;color:var(--grey);text-transform:uppercase;}
+.scroll-line{width:1px;height:38px;background:linear-gradient(var(--red),transparent);animation:scrollPulse 2s ease infinite;}
+@keyframes scrollPulse{0%,100%{opacity:.3;}50%{opacity:1;}}
+@keyframes floating{
+
+    0%{
+        transform:translateY(0px) rotateX(0deg);
+    }
+
+    50%{
+        transform:translateY(-12px) rotateX(5deg);
+    }
+
+    100%{
+        transform:translateY(0px) rotateX(0deg);
+    }
+
+}
+
+.showText{
+
+    opacity:1 !important;
+
+    transform:
+        translateY(0)
+        rotateX(0)
+        scale(1);
+
+    animation:floating 4s ease-in-out infinite;
+
+}
+@keyframes pulseGlow{
+
+    0%{
+        opacity:.4;
+    }
+
+    50%{
+        opacity:1;
+    }
+
+    100%{
+        opacity:.4;
+    }
+
+}
+.hideText{
+    opacity:0 !important;
+    transform:
+        translateY(-50px)
+        rotateX(90deg)
+        scale(.8);
+}
+/* ---------- section shell ---------- */
+section{position:relative;z-index:2;padding:160px 5vw;}
+.section-head{max-width:720px;margin:0 auto 90px;text-align:center;}
+.eyebrow{
+  font-family:var(--font-mono);font-size:11.5px;letter-spacing:.3em;color:var(--red);
+  text-transform:uppercase;display:block;margin-bottom:18px;
+}
+.section-title{
+  font-family:var(--font-display);font-weight:700;font-size:clamp(2.2rem,5vw,3.6rem);
+  letter-spacing:-.01em;line-height:1.05;
+}
+.section-sub{color:var(--grey);font-size:15.5px;margin-top:18px;line-height:1.6;font-weight:300;}
+.reveal{opacity:0;transform:translateY(40px);transition:opacity 1s cubic-bezier(.16,1,.3,1), transform 1s cubic-bezier(.16,1,.3,1);}
+.reveal.in{opacity:1;transform:translateY(0);}
+
+/* glass */
+.glass{
+  background:var(--glass);border:1px solid var(--glass-border);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-radius:18px;
+}
+
+/* ---------- about ---------- */
+.about-grid{
+  max-width:1180px;margin:0 auto;display:grid;grid-template-columns:.85fr 1.15fr;gap:64px;align-items:center;
+}
+.about-portrait{position:relative;border-radius:22px;overflow:hidden;aspect-ratio:4/5;}
+.about-portrait img{width:100%;height:100%;object-fit:cover;filter:saturate(.92) contrast(1.05);}
+.about-portrait::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg, transparent 55%, rgba(10,10,12,0.85) 100%),
+             linear-gradient(100deg, rgba(139,10,20,0.28), transparent 60%);
+}
+.about-portrait::before{
+  content:'';position:absolute;inset:0;border:1px solid var(--glass-border);border-radius:22px;z-index:2;
+}
+.about-text p{color:#c9c6c2;font-size:16.5px;line-height:1.8;font-weight:300;margin-bottom:22px;}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:44px;}
+.stat{padding:22px 20px;}
+.stat-num{font-family:var(--font-display);font-weight:700;font-size:2.4rem;color:var(--red);}
+.stat-label{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.12em;color:var(--grey);text-transform:uppercase;margin-top:6px;}
+
+/* ---------- skills ---------- */
+.skills-grid{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.skill-card{
+  padding:26px 22px;position:relative;overflow:hidden;transition:transform .4s ease, border-color .4s ease;
+}
+.skill-card:hover{transform:translateY(-6px);border-color:rgba(255,59,48,0.4);}
+.skill-card::before{
+  content:'';position:absolute;top:-40%;left:-40%;width:180%;height:180%;
+  background:radial-gradient(circle at center, rgba(255,59,48,0.14), transparent 60%);
+  opacity:0;transition:opacity .5s ease;
+}
+.skill-card:hover::before{opacity:1;}
+.skill-cat{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.14em;color:var(--red);text-transform:uppercase;position:relative;}
+.skill-name{font-family:var(--font-display);font-size:17px;font-weight:600;margin-top:10px;position:relative;}
+.skill-desc{color:var(--grey);font-size:12.5px;margin-top:8px;line-height:1.5;position:relative;font-weight:300;}
+
+/* ---------- projects ---------- */
+.project{
+  max-width:1180px;margin:0 auto 140px;display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center;
+}
+.project:nth-child(even){direction:rtl;}
+.project:nth-child(even) > *{direction:ltr;}
+.project:last-child{margin-bottom:0;}
+.project-visual{
+  aspect-ratio:4/3;border-radius:20px;position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.project-visual .glow{
+  position:absolute;width:60%;height:60%;border-radius:50%;
+  background:radial-gradient(circle, rgba(255,59,48,0.35), transparent 70%);filter:blur(40px);
+}
+.project-visual .p-index{
+  font-family:var(--font-display);font-weight:700;font-size:9rem;color:transparent;
+  -webkit-text-stroke:1px rgba(255,255,255,0.14);position:relative;
+}
+.project-num{font-family:var(--font-mono);font-size:11px;color:var(--red);letter-spacing:.1em;}
+.project-title{font-family:var(--font-display);font-weight:700;font-size:clamp(1.7rem,3vw,2.5rem);margin-top:12px;letter-spacing:-.01em;}
+.project-desc{color:#c9c6c2;font-size:15px;line-height:1.75;margin-top:18px;font-weight:300;}
+.project-stack{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px;}
+.chip{
+  font-family:var(--font-mono);font-size:10.5px;padding:6px 13px;border-radius:100px;
+  border:1px solid var(--glass-border);color:var(--grey);letter-spacing:.03em;
+}
+.project-links{display:flex;gap:14px;margin-top:28px;}
+.p-link{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--white);text-decoration:none;padding:11px 22px;border-radius:100px;
+  border:1px solid var(--glass-border);transition:all .35s ease;display:inline-block;
+}
+.p-link:hover{border-color:var(--red);color:var(--red);}
+.p-link.primary{background:var(--red);border-color:var(--red);color:var(--black);}
+.p-link.primary:hover{background:transparent;color:var(--red);}
+
+/* ---------- experience ---------- */
+.timeline{max-width:820px;margin:0 auto;position:relative;padding-left:0;}
+.timeline::before{
+  content:'';position:absolute;left:50%;top:0;bottom:0;width:1px;
+  background:linear-gradient(var(--red-deep), var(--red), var(--red-deep));transform:translateX(-50%);
+}
+.t-item{position:relative;width:50%;padding:0 48px 70px;}
+.t-item:nth-child(odd){left:0;text-align:right;}
+.t-item:nth-child(even){left:50%;text-align:left;}
+.t-item:last-child{padding-bottom:0;}
+.t-dot{
+  position:absolute;top:6px;width:11px;height:11px;border-radius:50%;background:var(--red);
+  box-shadow:0 0 0 5px rgba(255,59,48,0.15);
+}
+.t-item:nth-child(odd) .t-dot{right:-5.5px;}
+.t-item:nth-child(even) .t-dot{left:-5.5px;}
+.t-role{font-family:var(--font-display);font-weight:600;font-size:19px;}
+.t-org{font-family:var(--font-mono);font-size:11px;color:var(--red);letter-spacing:.08em;margin-top:6px;text-transform:uppercase;}
+.t-desc{color:var(--grey);font-size:14px;margin-top:12px;line-height:1.7;font-weight:300;}
+
+/* ---------- hackathons ---------- */
+.trophy-grid{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+.trophy{
+  padding:34px 26px;text-align:center;position:relative;transition:transform .5s ease;
+  transform-style:preserve-3d;
+}
+.trophy:hover{transform:rotateY(8deg) rotateX(4deg) translateY(-6px);border-color:rgba(255,59,48,0.4);}
+.trophy-icon{
+  width:52px;height:52px;margin:0 auto 20px;border-radius:50%;
+  background:radial-gradient(circle, rgba(255,59,48,0.25), transparent 70%);
+  border:1px solid rgba(255,59,48,0.4);display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display);font-weight:700;color:var(--red);font-size:15px;
+}
+.trophy-name{font-family:var(--font-display);font-weight:600;font-size:16px;line-height:1.4;}
+.trophy-org{font-family:var(--font-mono);font-size:10.5px;color:var(--grey);margin-top:10px;letter-spacing:.04em;}
+.trophy-date{font-family:var(--font-mono);font-size:10px;color:var(--red);margin-top:8px;letter-spacing:.08em;text-transform:uppercase;}
+
+/* ---------- certifications ---------- */
+.cert-grid{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+.cert-card{padding:28px 24px;transition:transform .4s ease,border-color .4s ease;}
+.cert-card:hover{transform:scale(1.035);border-color:rgba(255,59,48,0.4);}
+.cert-name{font-family:var(--font-display);font-weight:600;font-size:15.5px;line-height:1.4;}
+.cert-org{font-family:var(--font-mono);font-size:11px;color:var(--red);margin-top:12px;letter-spacing:.05em;}
+.cert-date{font-family:var(--font-mono);font-size:10px;color:var(--grey);margin-top:6px;letter-spacing:.08em;}
+
+/* ---------- contact ---------- */
+.contact-wrap{
+  max-width:1180px;margin:0 auto;display:grid;grid-template-columns:.9fr 1.1fr;gap:64px;align-items:center;
+  padding:70px;border-radius:26px;position:relative;overflow:hidden;
+}
+.contact-wrap::before{
+  content:'';position:absolute;top:-30%;right:-10%;width:60%;height:160%;
+  background:radial-gradient(circle, rgba(255,59,48,0.14), transparent 70%);filter:blur(60px);
+}
+.contact-portrait{border-radius:16px;overflow:hidden;aspect-ratio:1;position:relative;}
+.contact-portrait img{width:100%;height:100%;object-fit:cover;filter:grayscale(.3) contrast(1.05);}
+.contact-portrait::after{content:'';position:absolute;inset:0;background:linear-gradient(160deg, rgba(139,10,20,0.35), transparent 60%);}
+.contact-form{position:relative;display:flex;flex-direction:column;gap:16px;}
+.contact-form input,.contact-form textarea{
+  background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);border-radius:10px;
+  padding:15px 18px;color:var(--white);font-family:var(--font-body);font-size:14px;font-weight:300;
+  transition:border-color .3s ease, background .3s ease;
+}
+.contact-form input::placeholder,.contact-form textarea::placeholder{color:var(--grey);}
+.contact-form input:focus,.contact-form textarea:focus{
+  outline:none;border-color:var(--red);background:rgba(255,255,255,0.05);
+}
+.contact-form textarea{resize:vertical;min-height:110px;}
+.submit-btn{
+  align-self:flex-start;margin-top:6px;font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;
+  text-transform:uppercase;padding:15px 34px;border-radius:100px;background:var(--red);color:var(--black);
+  border:none;cursor:pointer;transition:transform .3s cubic-bezier(.34,1.56,.64,1), background .3s ease;
+  font-weight:500;
+}
+.submit-btn:hover{transform:scale(1.06);background:#ff574d;}
+.social-row{display:flex;gap:16px;margin-top:36px;}
+.social-pill{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;color:var(--grey);text-decoration:none;
+  border:1px solid var(--glass-border);padding:10px 18px;border-radius:100px;transition:all .3s ease;
+}
+.social-pill:hover{color:var(--white);border-color:var(--red);}
+
+footer{
+  position:relative;z-index:2;padding:44px 5vw;text-align:center;
+  font-family:var(--font-mono);font-size:11px;color:var(--grey);letter-spacing:.08em;
+  border-top:1px solid var(--glass-border);
+}
+footer span{color:var(--red);}
+
+/* ---------- responsive ---------- */
+@media (max-width:860px){
+  .nav-links{display:none;}
+  .about-grid,.contact-wrap{grid-template-columns:1fr;}
+  .project{grid-template-columns:1fr;}
+  .project:nth-child(even){direction:ltr;}
+  .skills-grid{grid-template-columns:repeat(2,1fr);}
+  .trophy-grid,.cert-grid{grid-template-columns:1fr 1fr;}
+  .stats-row{grid-template-columns:1fr;}
+  .contact-wrap{padding:36px 24px;}
+  section{padding:110px 6vw;}
+}
+@media (max-width:520px){
+  .trophy-grid,.cert-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<canvas id="particle-canvas"></canvas>
+
+<div id="intro">
+    <video
+    id="intro-video"
+    autoplay
+    muted
+    playsinline
+    preload="auto"
+    disablePictureInPicture
+>
+    <source src="./Create_an_ultra_cinematic_hyp.mp4" type="video/mp4">
+</video>
+<div id="intro-text">
+
+    <h3 id="line1">HELLO.</h3>
+
+    <h2 id="line2">
+        I AM <span>KHYATI SINGH</span>
+    </h2>
+
+    <h1 id="line3">
+        WELCOME TO MY<br>
+        PORTFOLIO
+    </h1>
+
+    <h2 id="line4">
+        I BUILD INTELLIGENT<br>
+        SOFTWARE &amp; AI EXPERIENCES
+    </h2>
+
+    <h2 id="line5">
+        LET'S EXPLORE<br>
+        MY WORLD
+    </h2>
+
+</div>
+<button id="intro-skip" type="button">Skip Intro</button>
+</div>
+
+<nav id="nav">
+  <div class="nav-logo">KHYATI <span>SINGH</span></div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Stack</a></li>
+    <li><a href="#projects">Work</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#hackathons">Hackathons</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<header class="hero">
+  <div class="hero-inner" id="hero-inner">
+    <span class="hero-eyebrow">Portfolio — 2026</span>
+    <h1 class="hero-name">KHYATI<br><span class="accent">SINGH</span></h1>
+    <div class="roles">
+      <ul>
+        <li>Full Stack Developer</li>
+        <li>AI Engineer</li>
+        <li>Creative Problem Solver</li>
+      </ul>
+    </div>
+  </div>
+  <div class="scroll-cue">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</header>
+
+<section id="about">
+  <div class="section-head reveal">
+    <span class="eyebrow">About</span>
+    <h2 class="section-title">Building at the intersection<br>of code and consequence.</h2>
+  </div>
+  <div class="about-grid">
+    <div class="about-portrait glass reveal">
+      <img src="khyati.jpeg" alt="Khyati Singh">
+    </div>
+    <div class="about-text reveal">
+      <p>I'm a Computer Science undergraduate at Banasthali Vidyapith, building full-stack web applications, real-time systems, and AI-driven platforms — most of them born under hackathon deadlines and shipped anyway.</p>
+      <p>My work leans toward problems that matter outside the demo: rural healthcare access in local dialects, safety systems for women, transparent AI negotiation for small sellers, and welfare access for underserved citizens. I care as much about the engineering honesty behind a feature as the polish on top of it.</p>
+      <div class="stats-row">
+        <div class="stat glass"><div class="stat-num">9+</div><div class="stat-label">Shipped Projects</div></div>
+        <div class="stat glass"><div class="stat-num">4</div><div class="stat-label">Hackathons</div></div>
+        <div class="stat glass"><div class="stat-num">2028</div><div class="stat-label">Grad Year</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="section-head reveal">
+    <span class="eyebrow">Command Center</span>
+    <h2 class="section-title">The stack behind the work.</h2>
+  </div>
+  <div class="skills-grid" id="skills-grid"></div>
+</section>
+
+<section id="projects">
+  <div class="section-head reveal">
+    <span class="eyebrow">Selected Work</span>
+    <h2 class="section-title">Seven problems.<br>Seven builds.</h2>
+  </div>
+  <div id="projects-list"></div>
+</section>
+
+<section id="experience">
+  <div class="section-head reveal">
+    <span class="eyebrow">Experience</span>
+    <h2 class="section-title">Where I've worked.</h2>
+  </div>
+  <div class="timeline" id="timeline"></div>
+</section>
+
+<section id="hackathons">
+  <div class="section-head reveal">
+    <span class="eyebrow">Hackathons</span>
+    <h2 class="section-title">Competed. Shipped. Learned.</h2>
+  </div>
+  <div class="trophy-grid" id="trophy-grid"></div>
+</section>
+
+<section id="certifications">
+  <div class="section-head reveal">
+    <span class="eyebrow">Certifications</span>
+    <h2 class="section-title">Credentials on record.</h2>
+  </div>
+  <div class="cert-grid" id="cert-grid"></div>
+</section>
+
+<section id="contact">
+  <div class="contact-wrap glass reveal">
+    <div class="contact-portrait">
+      <img src="khyati.jpeg" alt="Khyati Singh">
+    </div>
+    <div>
+      <span class="eyebrow">Get in touch</span>
+      <h2 class="section-title" style="font-size:clamp(1.8rem,3.4vw,2.6rem);margin-bottom:24px;">Let's build something that matters.</h2>
+      <form class="contact-form" onsubmit="return false;">
+        <input type="text" placeholder="Your name">
+        <input type="email" placeholder="Your email">
+        <textarea placeholder="Tell me about the opportunity"></textarea>
+        <button class="submit-btn" type="submit">Send message</button>
+      </form>
+      <div class="social-row">
+        <a class="social-pill" href="mailto:khyatisingh0304@gmail.com">Email</a>
+        <a class="social-pill" href="https://linkedin.com/in/khyati-singh-7495913b4" target="_blank" rel="noopener">LinkedIn</a>
+        <a class="social-pill" href="https://github.com/Khyati1106" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  © 2026 <span>Khyati Singh</span> — Designed &amp; engineered for the people who build things that outlast the demo.
+</footer>
+
+<script>
+/* ============ INTRO SEQUENCE ============ */
+const intro = document.getElementById('intro');
+const nav = document.getElementById('nav');
+const introVideo = document.getElementById('intro-video');
+const introSkip = document.getElementById('intro-skip');
+/* ============ CINEMATIC INTRO AUDIO ============ */
+
+let soundEnabled = false;
+
+function enableIntroSound() {
+    if (soundEnabled) return;
+
+    soundEnabled = true;
+
+    introVideo.muted = false;
+    introVideo.volume = 1;
+
+    const playPromise = introVideo.play();
+
+    if (playPromise !== undefined) {
+        playPromise.catch(() => {
+            introVideo.muted = true;
+            soundEnabled = false;
+        });
+    }
+
+    document.removeEventListener('click', enableIntroSound);
+    document.removeEventListener('touchstart', enableIntroSound);
+    document.removeEventListener('keydown', enableIntroSound);
+}
+
+document.addEventListener('click', enableIntroSound, { once: true });
+document.addEventListener('touchstart', enableIntroSound, { once: true });
+document.addEventListener('keydown', enableIntroSound, { once: true });
+const line1=document.getElementById("line1");
+const line2=document.getElementById("line2");
+const line3=document.getElementById("line3");
+const line4=document.getElementById("line4");
+const line5 = document.getElementById("line5");
+
+let introEnded = false;
+let introTimers = [];
+
+const heroRevealEls = document.querySelectorAll('.hero-eyebrow, .hero-name, .roles, .scroll-cue');
+
+function endIntro(){
+    if(introEnded) return;
+    introEnded = true;
+
+    // stop every pending text-timeline timer so nothing fires after removal
+    introTimers.forEach(id => clearTimeout(id));
+    introTimers = [];
+
+    // Fire the fade-out and the portfolio reveal in the SAME frame — no
+    // artificial pause between "video ended" and "site starts". The hero
+    // content used to fade in on a fixed clock from page-load (3–4.2s)
+    // regardless of when the video actually finished; now it's triggered
+    // exactly when the intro ends, so it's always perfectly in sync.
+    intro.classList.add("hidden");
+    nav.classList.add("show");
+    heroRevealEls.forEach(el => el.classList.add("reveal-hero"));
+
+    // Remove the intro node once its own dissolve finishes — purely DOM
+    // cleanup, doesn't block or delay anything visible underneath.
+    setTimeout(()=>{
+        if(intro.parentNode) intro.remove();
+    },900);
+}
+
+// TEXT TIMELINE
+/* ============ VOICE SYNCHRONIZED TEXT ============ */
+
+function showLine(line, duration) {
+    line.classList.add("showText");
+
+    setTimeout(() => {
+        line.classList.replace("showText", "hideText");
+    }, duration);
+}
+
+// HELLO
+introTimers.push(
+    setTimeout(() => {
+        showLine(line1, 800);
+    }, 300)
+);
+
+// I AM KHYATI SINGH
+introTimers.push(
+    setTimeout(() => {
+        showLine(line2, 1300);
+    }, 1200)
+);
+
+// WELCOME TO MY PORTFOLIO
+introTimers.push(
+    setTimeout(() => {
+        showLine(line3, 1500);
+    }, 2700)
+);
+
+// I BUILD INTELLIGENT SOFTWARE & AI EXPERIENCES
+introTimers.push(
+    setTimeout(() => {
+        showLine(line4, 2700);
+    }, 4300)
+);
+
+// LET'S EXPLORE MY WORLD
+introTimers.push(
+    setTimeout(() => {
+        line5.classList.add("showText");
+    }, 7200)
+);
+
+// Primary path: the portfolio starts the instant the video finishes —
+// no pause, no waiting.
+introVideo.addEventListener("ended", endIntro);
+
+// Fallback #1: if the video file fails to load (wrong path, missing file,
+// unsupported format) the "ended" event never fires and the intro used to
+// stay on screen forever. Catch that and end the intro immediately.
+introVideo.addEventListener("error", () => {
+    endIntro();
+});
+
+// Fallback #2: some browsers/devices silently block autoplay even when
+// muted (e.g. low-power mode, certain mobile browsers). play() returns a
+// promise in that case — if it rejects, don't wait on an "ended" event
+// that will never come.
+const playPromise = introVideo.play();
+if (playPromise !== undefined) {
+    playPromise.catch(() => {
+        endIntro();
+    });
+}
+
+// Fallback #3: safety net sized to the video's REAL length, not a guess.
+// The video is always meant to finish on its own via "ended" above — this
+// timer only exists to rescue the page if the video is broken/stalled.
+// Once we know the true duration we arm a timer a few seconds past it,
+// so a healthy video always plays out in full, uninterrupted.
+let safetyTimer = null;
+function armSafetyTimer(ms){
+    if (safetyTimer) clearTimeout(safetyTimer);
+    safetyTimer = setTimeout(endIntro, ms);
+    introTimers.push(safetyTimer);
+}
+if (introVideo.readyState >= 1 && isFinite(introVideo.duration)) {
+    // metadata already available
+    armSafetyTimer(introVideo.duration * 1000 + 3000);
+} else {
+    introVideo.addEventListener("loadedmetadata", () => {
+        armSafetyTimer(introVideo.duration * 1000 + 3000);
+    }, { once: true });
+    // metadata hasn't arrived yet — give it a generous window to show up
+    // before assuming the file is missing/broken; gets replaced above
+    // the instant real duration is known.
+    armSafetyTimer(20000);
+}
+
+// Manual skip button (was styled in CSS but never wired up before).
+introSkip.addEventListener("click", endIntro);
+
+/* ============ PARTICLE CANVAS ============ */
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [];
+const COUNT = window.innerWidth < 700 ? 45 : 90;
+
+function initParticles(){
+  particles = [];
+  for(let i=0;i<COUNT;i++){
+    particles.push({
+      x: Math.random()*window.innerWidth,
+      y: Math.random()*window.innerHeight,
+      r: Math.random()*1.8+0.4,
+      vy: Math.random()*0.25+0.05,
+      vx: (Math.random()-0.5)*0.15,
+      o: Math.random()*0.5+0.15
+    });
+  }
+}
+function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const scrollY = window.scrollY;
+  particles.forEach(p=>{
+    const y = (p.y + scrollY*0.15) % window.innerHeight;
+    ctx.beginPath();
+    ctx.arc(p.x, y, p.r, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(255,59,48,${p.o})`;
+    ctx.shadowColor = 'rgba(255,59,48,0.8)';
+    ctx.shadowBlur = 6;
+    ctx.fill();
+    p.x += p.vx;
+    p.y -= p.vy;
+    if(p.y < -10) p.y = window.innerHeight + 10;
+    if(p.x < -10) p.x = window.innerWidth + 10;
+    if(p.x > window.innerWidth+10) p.x = -10;
+  });
+  requestAnimationFrame(draw);
+}
+function setupCanvas(){
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  initParticles();
+}
+setupCanvas();
+window.addEventListener('resize', setupCanvas);
+draw();
+
+/* ============ HERO PARALLAX ============ */
+const heroInner = document.getElementById('hero-inner');
+if(window.matchMedia('(pointer:fine)').matches){
+  window.addEventListener('mousemove', (e)=>{
+    const x = (e.clientX / window.innerWidth - 0.5) * 14;
+    const y = (e.clientY / window.innerHeight - 0.5) * -10;
+    heroInner.style.transform = `rotateY(${x}deg) rotateX(${y}deg)`;
+  });
+}
+
+/* ============ SCROLL REVEAL ============ */
+const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if(entry.isIntersecting){
+            entry.target.classList.add("in");
+        }
+    });
+},{
+    threshold:0.15
+});
+
+document.querySelectorAll(".reveal").forEach(el=>{
+    io.observe(el);
+});
+
+/* ============ CONTENT DATA (from resume) ============ */
+const skills = [
+  {cat:'Languages', name:'C / C++ / Python', desc:'JavaScript ES6+, HTML5, CSS3'},
+  {cat:'Backend', name:'Node.js & Express', desc:'WebSockets, Socket.IO, REST APIs, SQLite'},
+  {cat:'AI / ML', name:'Claude API', desc:'Scikit-learn, Pandas, NumPy, NLP, Neural Nets'},
+  {cat:'Data Science', name:'Supervised Learning', desc:'Unsupervised learning, model evaluation'},
+  {cat:'Tools', name:'Git & GitHub', desc:'VS Code, Jupyter Notebook, Postman'},
+  {cat:'Core CS', name:'DSA & OOP', desc:'DBMS, Discrete Mathematics, Computer Networks'},
+  {cat:'Design', name:'UI / UX', desc:'Responsive design systems'},
+  {cat:'Realtime', name:'Socket.IO', desc:'Low-latency multiplayer & chat architectures'},
+];
+
+const projects = [
+  {
+    num:'01', title:'DECEPTION', period:'May – June 2026',
+    desc:'A server-authoritative real-time multiplayer social deduction game with server-enforced state validation to eliminate client-side cheating. AI bots auto-fill sub-6-player lobbies, and an AI "Watcher" disruption engine runs on a weighted-random rules system. End-of-match narratives are generated live via the Claude API with a local deterministic fallback, with every match logged to SQLite.',
+    stack:['Node.js','Express','Socket.IO','SQLite','Claude API']
+  },
+  {
+    num:'02', title:'Project JANM', period:'July 2026',
+    desc:'A Digital Citizen Twin system that predicts life events and dynamically matches citizens to eligible welfare schemes. Built with automated document verification, smart application auto-filling, dynamic alert delivery, and multilingual voice navigation for digital inclusion.',
+    stack:['Python','Node.js','ML / NLP','Web Architecture']
+  },
+  {
+    num:'03', title:'AI Negotiation Marketplace', period:'2026',
+    desc:'An e-commerce prototype where an autonomous AI agent bargains with buyers on a seller\'s behalf in real time. Seller-defined price-floor constraints let the agent negotiate and close deals independently — inspired by Indian bazaar culture, with a dual-layer fallback system built for demo reliability.',
+    stack:['Node.js','Express','WebSockets','Python','NLP']
+  },
+  {
+    num:'04', title:'SHRIN-GAR AI', period:'2026',
+    desc:'A virtual bridal styling suite connecting brides with unorganized beauty artists in Delhi through personalized styling guidance and virtual try-ons — with consultation scheduling, digital product galleries, and an escrow-secured payment framework to build trust for independent women artists.',
+    stack:['HTML5','CSS3','JavaScript','AI Integration']
+  },
+  {
+    num:'05', title:'VoiceCare AI', period:'June 2026',
+    desc:'A voice-first rural health triage assistant accepting local dialect input and responding in Hindi. Real-time speech recognition and synthesized voice feedback power a diagnostic assistant that processes symptoms via voice or text and escalates critical cases to ASHA workers.',
+    stack:['HTML5','CSS3','JavaScript','Web Speech API']
+  },
+  {
+    num:'06', title:'SupText', period:'2026',
+    desc:'A full-stack real-time messaging and video-landing portal with dynamic chatroom creation and session authentication, with Socket.IO connections optimized for low-latency data transmission.',
+    stack:['Node.js','Express','WebSockets','HTML5','CSS3']
+  },
+  {
+    num:'07', title:'SHEshield', period:'2026',
+    desc:'A responsive women\'s safety web app with swift access to emergency helplines, live location sharing, and local safety resources — spanning behavioral panic detection, mesh SOS, and predictive risk scoring across multiple hackathon judging tracks.',
+    stack:['HTML5','CSS3','JavaScript']
+  },
+];
+
+const experience = [
+  {role:'Marketing Intern', org:'Corizo (Exlutech Pvt. Ltd.)', desc:'Contributed to strategic outreach initiatives and digital marketing campaigns; collaborated cross-functionally to improve brand engagement and conversion metrics.'},
+  {role:'GenAI-Powered Data Analytics Virtual Intern', org:'Tata (via Forage)', desc:'Conducted EDA, risk profiling, and delinquency prediction using GenAI methodologies; developed BI reports and data storytelling frameworks.'},
+  {role:'Cybersecurity Analyst Virtual Intern', org:'Tata (via Forage)', desc:'Evaluated enterprise security postures and IAM framework strategies; designed custom IAM compliance solutions.'},
+];
+
+const hackathons = [
+  {name:'Build The Next Big UI Hackathon', org:'TechVerse Solutions / Unstop — Qualified Round 1', date:'July 2026'},
+  {name:'WebForge: Smart Campus Webathon', org:'Manipal University, Jaipur — Participant', date:'July 2026'},
+  {name:'Heritage to Horizon: 24-Hour Ideathon', org:'IEEE GTBIT / WIE WEEK 2.0 — Participant', date:'July 2026'},
+  {name:'National AI/ML Hackathon', org:'Vivriti Capital / YUVAAN, IIT Hyderabad — Team Tripleone', date:'2026'},
+  {name:'CampusCrew 100K Milestone', org:'Recognized for student community contributions', date:'June 2026'},
+  {name:'30+ Algorithmic Challenges', org:'LeetCode & HackerRank', date:'Ongoing'},
+];
+
+const certs = [
+  {name:'AI-Machine Learning Engineer Certificate', org:'Reliance Foundation Skilling Academy', date:'July 2026'},
+  {name:'GenAI Powered Data Analytics Simulation', org:'Tata / Forage', date:'July 2026'},
+  {name:'Cybersecurity Analyst Simulation', org:'Tata / Forage', date:'June 2026'},
+  {name:'Python for Data Science and AI', org:'IBM / Coursera', date:''},
+  {name:'C++ Programming Fundamentals', org:'Online Certification', date:''},
+  {name:'Machine Learning Specialization', org:'DeepLearning.AI / Coursera', date:'In Progress'},
+];
+
+/* ============ RENDER ============ */
+document.getElementById('skills-grid').innerHTML = skills.map(s=>`
+  <div class="skill-card glass">
+    <span class="skill-cat">${s.cat}</span>
+    <div class="skill-name">${s.name}</div>
+    <div class="skill-desc">${s.desc}</div>
+  </div>
+`).join('');
+
+document.getElementById('projects-list').innerHTML = projects.map(p=>`
+  <div class="project reveal">
+    <div class="project-visual glass">
+      <div class="glow"></div>
+      <div class="p-index">${p.num}</div>
+    </div>
+    <div>
+      <span class="project-num">${p.num} — ${p.period}</span>
+      <h3 class="project-title">${p.title}</h3>
+      <p class="project-desc">${p.desc}</p>
+      <div class="project-stack">${p.stack.map(s=>`<span class="chip">${s}</span>`).join('')}</div>
+      <div class="project-links">
+        <a class="p-link primary" href="https://github.com/Khyati1106" target="_blank" rel="noopener">GitHub</a>
+        <a class="p-link" href="#contact">Ask about it</a>
+      </div>
+    </div>
+  </div>
+`).join('');
+
+document.getElementById('timeline').innerHTML = experience.map(e=>`
+  <div class="t-item reveal">
+    <div class="t-dot"></div>
+    <div class="t-role">${e.role}</div>
+    <div class="t-org">${e.org}</div>
+    <div class="t-desc">${e.desc}</div>
+  </div>
+`).join('');
+
+document.getElementById('trophy-grid').innerHTML = hackathons.map(h=>`
+  <div class="trophy glass reveal">
+    <div class="trophy-icon">★</div>
+    <div class="trophy-name">${h.name}</div>
+    <div class="trophy-org">${h.org}</div>
+    <div class="trophy-date">${h.date}</div>
+  </div>
+`).join('');
+
+document.getElementById('cert-grid').innerHTML = certs.map(c=>`
+  <div class="cert-card glass reveal">
+    <div class="cert-name">${c.name}</div>
+    <div class="cert-org">${c.org}</div>
+    ${c.date ? `<div class="cert-date">${c.date}</div>` : ''}
+  </div>
+`).join('');
+
+/* re-observe dynamically injected reveal elements */
+document.querySelectorAll('.reveal').forEach(el=>{
+  if(!el.classList.contains('in')) io.observe(el);
+});
+</script>
+</body>
+</html>
