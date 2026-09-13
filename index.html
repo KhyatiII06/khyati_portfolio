@@ -767,18 +767,18 @@ function startIntroVideo() {
     introVideo.setAttribute("muted", "");
     introVideo.setAttribute("playsinline", "");
     introVideo.playsInline = true;
-
-    const playPromise = introVideo.play();
-
-    if (playPromise !== undefined) {
-        playPromise.catch(() => {
-            // Do NOT immediately skip the intro.
-            // Wait for user interaction.
-            console.log("Autoplay blocked. Waiting for user interaction.");
-        });
-    }
 }
+const playPromise = introVideo.play();
 
+if (playPromise !== undefined) {
+
+    playPromise.catch(() => {
+
+        console.log("Mobile autoplay was blocked.");
+
+    });
+
+}
 startIntroVideo();
 
 document.addEventListener("touchstart", () => {
@@ -809,7 +809,7 @@ if (introVideo.readyState >= 1 && isFinite(introVideo.duration)) {
     // metadata hasn't arrived yet — give it a generous window to show up
     // before assuming the file is missing/broken; gets replaced above
     // the instant real duration is known.
-    armSafetyTimer(60000);
+    armSafetyTimer(20000);
 }
 
 // Manual skip button (was styled in CSS but never wired up before).
