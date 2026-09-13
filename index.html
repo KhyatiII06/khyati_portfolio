@@ -761,12 +761,32 @@ introVideo.addEventListener("error", () => {
 // muted (e.g. low-power mode, certain mobile browsers). play() returns a
 // promise in that case — if it rejects, don't wait on an "ended" event
 // that will never come.
-const playPromise = introVideo.play();
-if (playPromise !== undefined) {
-    playPromise.catch(() => {
-        endIntro();
-    });
+// Mobile-safe video playback
+function startIntroVideo() {
+    introVideo.muted = true;
+    introVideo.setAttribute("muted", "");
+    introVideo.setAttribute("playsinline", "");
+    introVideo.playsInline = true;
+
+    const playPromise = introVideo.play();
+
+    if (playPromise !== undefined) {
+        playPromise.catch(() => {
+            // Do NOT immediately skip the intro.
+            // Wait for user interaction.
+            console.log("Autoplay blocked. Waiting for user interaction.");
+        });
+    }
 }
+
+startIntroVideo();
+
+document.addEventListener("touchstart", () => {
+    if (introVideo.paused) {
+        introVideo.muted = true;
+        introVideo.play().catch(() => {});
+    }
+}, { once: true });
 
 // Fallback #3: safety net sized to the video's REAL length, not a guess.
 // The video is always meant to finish on its own via "ended" above — this
@@ -789,7 +809,7 @@ if (introVideo.readyState >= 1 && isFinite(introVideo.duration)) {
     // metadata hasn't arrived yet — give it a generous window to show up
     // before assuming the file is missing/broken; gets replaced above
     // the instant real duration is known.
-    armSafetyTimer(20000);
+    armSafetyTimer(60000);
 }
 
 // Manual skip button (was styled in CSS but never wired up before).
